@@ -1,0 +1,8 @@
+
+------------------------------------------------------------------------------------
+Essa pasta contém uma gramática com todos os recursos de geração de código do FACC
+------------------------------------------------------------------------------------
+
+- calc.gra: gramática que demonstra a sintaxe de uma gramática aceita pelo FACC
+
+

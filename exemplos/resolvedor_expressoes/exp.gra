@@ -1,0 +1,15 @@
+
+expressao_aritmetica -> termo
+|  expressao_aritmetica '+' termo 
+|  expressao_aritmetica '-' termo 
+;
+
+termo -> fator
+| termo '*' fator 
+| termo '/' fator 
+;
+
+fator -> 'num'.numatrib 
+| '(' expressao_aritmetica ')' 
+;
+

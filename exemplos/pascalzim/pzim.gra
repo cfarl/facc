@@ -1,0 +1,268 @@
+
+/* =========== DEFINICAO DE PROGRAMA =========== */
+
+programa -> cabecalho_programa declaracao_uses declaracoes bloco_comandos '.' 
+| 'unit' 'id'.idatrib ';' 'interface' declaracao_uses declaracoes_interface 'implementation' declaracao_uses declaracoes bloco_comandos '.' 
+| 'unit' 'id'.idatrib ';' 'interface' declaracao_uses declaracoes_interface 'implementation' declaracao_uses declaracoes 'end' '.' 
+;
+
+cabecalho_programa -> 'program' 'id'.idatrib  ';' 
+| 'program' 'id'.idatrib '(' lista_identificadores ')' ';' 
+| # 
+;
+
+declaracao_uses -> 'uses' lista_identificadores ';' 
+| # 
+;
+
+declaracoes -> declaracoes declaracoes_comum 
+| declaracoes declaracao_funcao 
+| declaracoes declaracao_procedimento 
+| declaracoes 'label' lista_label ';'  
+| # 
+;
+
+declaracoes_comum -> 'const' bloco_constantes 
+| 'type' bloco_declaracao_tipos 
+| 'Var' bloco_variaveis
+;
+
+
+declaracoes_interface -> declaracoes_interface declaracoes_comum 
+| declaracoes_interface cabecalho_funcao
+| declaracoes_interface cabecalho_procedimento 
+| # 
+;
+ 
+lista_label -> lista_label ',' rotulo_label
+| rotulo_label ;
+
+rotulo_label -> 'id'.idatrib
+| 'num'.numatrib 
+;
+
+
+/* =========== DEFINICAO DE VARIAVEIS =========== */
+
+bloco_variaveis-> bloco_variaveis lista_variaveis
+| lista_variaveis
+; 
+
+lista_variaveis -> lista_identificadores ':' tipo ';' 
+| lista_identificadores ':' tipo 'opComparacao'.opatrib expressao_constante ';'  
+;
+
+
+lista_identificadores -> lista_identificadores ',' 'id'.idatrib
+| 'id'.idatrib
+;
+
+/* =========== DEFINICAO DE CONSTANTES =========== */
+
+
+bloco_constantes -> bloco_constantes lista_constantes 
+| lista_constantes
+;
+
+lista_constantes -> lista_identificadores 'opComparacao'.opatrib expressao  ';'
+| lista_identificadores ':' tipo 'opComparacao'.opatrib expressao_constante ';'  
+;
+
+
+expressao_constante -> expressao
+| '(' lista_expressoes ')' 
+| '(' expressao_parenteses_aninhados ')' 
+| '(' expressao_registro ')'  
+| '(' lista_expressao_registro ')' 
+;
+
+lista_expressao_registro -> lista_expressao_registro ',' '(' expressao_registro ')'
+| '(' expressao_registro ')' ;
+
+expressao_registro -> expressao_registro ';' 'id'.idatrib ':' expressao_constante 
+| 'id'.idatrib ':' expressao_constante
+;
+
+expressao_parenteses_aninhados -> expressao_parenteses_aninhados ',' expressao_parenteses_aninhados
+| '(' expressao_parenteses_aninhados ')' 
+| '(' lista_expressoes ')' 
+| '(' lista_expressao_registro ')'
+;
+
+
+/* =========== DEFINICAO DE TIPOS =========== */
+
+bloco_declaracao_tipos -> bloco_declaracao_tipos lista_identificadores 'opComparacao'.opatrib tipo ';' 
+| lista_identificadores 'opComparacao'.opatrib tipo ';'  
+;
+
+tipo -> tipo_definido 
+| '^' tipo_definido
+| 'array' '[' limites_vetor ']' 'of' tipo 
+| 'record' camposRegistro 'end' 
+| '(' lista_identificadores ')'  
+| expressao_aritmetica '..' expressao_aritmetica 
+| 'file' 'of' tipo 
+| 'set' 'of' tipo 
+| 'function' argumentos ':' tipo_definido  
+| 'procedure' argumentos  
+;
+
+tipo_definido -> 'id'.tipoatrib
+| 'tipoPredefinido'.tpatrib   
+| 'tipoPredefinido'.tpatrib '[' expressao_aritmetica ']'  
+; 
+
+limites_vetor -> limites_vetor ',' limites_vetor
+| expressao_aritmetica '..' expressao_aritmetica 
+| 'id'.idAtrib                        
+;
+
+camposRegistro-> campos ';'
+| campos 
+;
+
+campos-> campos ';' lista_identificadores ':' tipo  
+| lista_identificadores ':' tipo 
+;
+
+
+/* =========== DEFINICAO DE FUNCOES =========== */
+
+declaracao_funcao -> cabecalho_funcao declaracoes bloco_comandos ';' 
+| cabecalho_funcao 'forward' ';' 
+; 
+
+cabecalho_funcao -> 'function' 'id'.funcatrib argumentos ':' tipo_definido ';' ; 
+
+argumentos -> '(' lista_parametros ')' 
+| '(' ')'
+| # 
+;
+
+lista_parametros -> lista_parametros ';' parametros 
+| parametros 
+;
+
+
+parametros -> lista_identificadores ':' tipo_definido
+| 'Var' lista_identificadores ':' tipo_definido 
+;
+
+/* =========== DEFINICAO DE PROCEDIMENTOS =========== */
+
+declaracao_procedimento -> cabecalho_procedimento declaracoes bloco_comandos ';' 
+| cabecalho_procedimento 'forward' ';' 
+; 
+
+cabecalho_procedimento ->  'procedure' 'id'.procatrib argumentos ';' ;
+                                                    
+/* =========== DEFINICAO DE COMANDOS =========== */
+
+bloco_comandos -> 'begin' lista_comandos 'end' ;
+          
+lista_comandos -> lista_comandos ';' comando  
+| comando 
+;
+
+comando -> #
+| bloco_comandos
+| variavel ':=' expressao
+| 'id'.procatrib
+| 'id'.procatrib2 '(' lista_expressoes_funcao ')' 
+| 'if'.linatrib expressao 'then'comando
+| 'if'.linatrib expressao 'then' comando 'else' comando 
+| 'case'.linatrib expressao 'of' enunciadoCase 'else' lista_comandos 'end' 
+| 'case'.linatrib expressao 'of' enunciadoCase 'end' 
+| 'while'.linatrib expressao 'do' comando  
+| 'repeat'.linatrib lista_comandos 'until' expressao
+| 'for'.linatrib variavel ':=' expressao 'direcaofor'.direcaoAtrib expressao 'do' comando
+| 'with'.linatrib lista_variaveis_with 'do' comando
+| rotulo_label ':' comando 
+| 'goto'.linatrib rotulo_label  
+;  
+
+enunciadoCase-> listaCase ';'
+| listaCase 
+;
+
+listaCase-> listaCase ';' listaElementosCase ':' comando 
+| listaElementosCase ':' comando 
+;
+
+listaElementosCase -> listaElementosCase ',' ElementoCase
+| ElementoCase 
+;
+
+ElementoCase-> expressao_aritmetica                
+| expressao_aritmetica '..' expressao_aritmetica   
+; 
+
+lista_variaveis_with -> lista_variaveis_with ',' variavel
+| variavel 
+;
+
+variavel -> 'id'.varatrib idtail 
+;
+
+idtail -> '.' 'id'.idatrib idtail
+| '[' lista_expressoes ']' idtail
+| '^' idtail 
+| '(' lista_expressoes_funcao ')' idtail    
+| #
+;
+
+
+/* =========== DEFINICAO DE EXPRESSOES. O operador é especificado pelo atributo =========== */
+
+expressao -> expressao_aritmetica
+| expressao 'opComparacao'.opatrib expressao_aritmetica 
+;
+
+expressao_aritmetica -> termo
+|  expressao_aritmetica 'opAritmetico'.opatrib termo 
+;
+
+termo -> fator
+| termo 'opMultiplicacao'.opatrib fator 
+;
+
+fator -> '@' variavel 
+| variavel  
+| 'num'.numatrib 
+| 'caracter'.caracatrib 
+| 'cadeia'.cadeiaatrib 
+| 'booleano'.boolatrib 
+| 'opAritmetico'.opatrib fator  /* Trata +fator, -fator e not fator*/
+| 'nil' 
+| '(' expressao ')' 
+| '[' expressoes_conjunto ']' 
+| 'tipoPredefinido'.tpatrib
+;
+
+lista_expressoes_funcao -> expressoes_funcao
+| #
+;
+
+expressoes_funcao -> expressoes_funcao ',' expressao_funcao 
+| expressao_funcao 
+;
+
+expressao_funcao -> expressao
+| expressao ':' expressao_aritmetica
+| expressao ':' expressao_aritmetica ':' expressao_aritmetica
+;
+
+lista_expressoes -> expressao 
+| expressao ',' lista_expressoes 
+;
+
+expressoes_conjunto -> lista_expressoes_conjunto 
+| # 
+;
+
+lista_expressoes_conjunto -> lista_expressoes_conjunto ',' expressao 
+| expressao 
+| lista_expressoes_conjunto ',' expressao_aritmetica '..' expressao_aritmetica
+| expressao_aritmetica '..' expressao_aritmetica
+;

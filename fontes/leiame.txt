@@ -1,0 +1,12 @@
+
+- Essa pasta contém os fontes do projeto.
+
+- O projeto pode ser aberto no Eclipse IDE for C/C++ Developers:
+
+  https://www.eclipse.org/downloads/index-packages.php
+
+- O desenvolvimento está sendo realizado com o Eclipse fazendo uso compilador C++ do MingW:
+
+  https://sourceforge.net/projects/mingw/files/
+
+- Tendo instalado o Mingw e o Eclipse, basta importar o projeto a partir da IDE.

@@ -1,0 +1,7 @@
+
+Calc local {int val;} -> 'C' Expressao(&val) { printf("%d",val); } ;                             
+                                                                  
+Expressao(int *val) local { int val1; } -> Termo(val) 
+| Expressao(val) '+' Termo(&val1) { *val += val1; } ; 
+                                                                  
+Termo(int *val) local { int val1; } -> 'numero'.val1  { *val = val1; }                            | Termo(val) '*' 'numero'.val1 { *val *= val1; } ;

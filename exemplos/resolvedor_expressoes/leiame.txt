@@ -1,0 +1,11 @@
+
+-------------------------------------------------------------------------------
+Essa pasta contém a gramática e o código pronto de um resolvedor de expressões 
+-------------------------------------------------------------------------------
+
+- exp.gra: gramática usada para gerar os arquivos pelo FACC
+
+- compilador.cpp: arquivo que contém o método 'main' do programa
+
+- demais arquivos: contém código que foi adicionado àquele gerado pelo FACC
+

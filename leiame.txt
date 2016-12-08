@@ -1,0 +1,437 @@
+﻿   #===============================================================#
+   |                                                               |
+   |    ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒                                   |
+   |    ▒▒                                                         |
+   |    ▒▒     ▒▒▒▒▒ ▒▒▒▒▒ ▒▒▒▒▒   Autores                         |
+   |    ▒▒▒▒▒▒    ▒▒ ▒▒    ▒▒      -------                         |
+   |    ▒▒     ▒▒▒▒▒ ▒▒    ▒▒      Cláudio Dobbin                  |
+   |    ▒▒     ▒▒ ▒▒ ▒▒    ▒▒      Edward Lucio Vieira Borba       |
+   |    ▒▒     ▒▒▒▒▒ ▒▒▒▒▒ ▒▒▒▒▒   Luiz Reginaldo A. F. Curado     |
+   |                                                               |
+   |                  versão 3.0                                   | 
+   #===============================================================#
+
+
+   #===============================================================#
+   #    Manual de Referência                                       #
+   #===============================================================#
+   |                                                               |
+   | Este arquivo  contém  informações  sobre  a utilização do     |
+   | FACC - Ferramenta de Apoio a Construcao do Compiladores.      |
+   |                                                               |
+   | Os tópicos apresentados são:                                  |
+   |                                                               |
+   | 1. Descrição da Ferramenta                                    | 
+   | 2. Requisitos de Hardware e Software                          |
+   | 3. Interpretador de gramaticas                                |
+   | 4. Ambiguidades                                               |
+   | 5. Os produtos gerados                                        |
+   |  5.1 - Parser LALR(1)                                         |
+   |  5.1.1 - Tratamento de erros                                  |  
+   |  5.2 - Processador Semantico                                  |
+   |  5.3 - Informacoes Auxiliares                                 |
+   |  5.4 - Interface entre os produtos                            |
+   | 6. Operacao                                                   |
+   | 7. Copias                                                     |
+   | 8. Possiveis "BUGS"                                           |
+   | 9. Endereco para contato                                      |
+   |                                                               |
+   #===============================================================#
+
+
+   #===============================================================#
+   |    Histórico da ferramenta                                    |
+   #===============================================================#
+   |                                                               |
+   | Versão 3.0                                                    |
+   | -----------                                                   |
+   | - Desenvolvida por Luiz Reginaldo A. F. Curado                |
+   | - A partir de uma gramática de atributos produz arquivos com  |
+   |   código C++ para o analisador sintático LALR(1), o analisador|
+   |   léxico, o analisador semântico e o tradutor.                |
+   | - No código gerado, o analisador léxico é chamado pelo        |
+   |   analisador sintático como parte do processo de tradução.    |
+   | - No código gerado, o tradutor chama o analisador sintático e |
+   |   o analisador semântico.                                     | 
+   | - Nessa versão o código original foi quase todo migrado de C  |
+   |   para C++. Foram realizados diversas otimizações e           |
+   |   refatoramentos de código, incluindo a troca de listas de    |
+   |   ponteiros por classes da biblioteca STL.                    | 
+   |                                                               |
+   | Versão 2.0                                                    |
+   | -----------                                                   |
+   | - Desenvolvida por Edward Lucio Vieira Borba                  |
+   | - A partir de uma gramática de atributos produz arquivos com  |
+   |   código C para o analisador sintático LALR(1) e o analisador |
+   |   semântico.                                                  |
+   | - Realizadas correções e otimizações.                         |
+   | - Versão liberada para uso público.                           |
+   |                                                               |
+   | Versão 1.0                                                    |
+   | -----------                                                   |
+   | - Desenvolvida por Edward Lucio Vieira Borba e Cláudio Dobbin |
+   | - A partir de uma gramática de atributos produz arquivos com  |
+   |   código C para o analisador sintático LALR(1).               |
+   |                                                               |
+   #===============================================================#
+
+
+   #===============================================================#
+   #    1. Descrição da Ferramenta                                 #
+   #===============================================================#
+   |                                                               |
+   | FACC é uma ferramenta que provê a geração automatica de       |
+   | parsers LALR(1) e processadores semânticos para um esquema    |
+   | eficiente de compilacao em dois passos, baseado em gramáticas |
+   | de atributos.                                                 | 
+   |                                                               |
+   | Principais caracteristicas:                                   |
+   |                                                               |
+   | 1. Separa a Análise Sintática do Processamento Semântico;     |
+   | 2. Não impõe restrições à gramatica;                          |
+   | 4. Usa uma Representacao Intermediária Sintética (RIS) entre  |
+   |    os passos da compilacao;                                   |
+   | 5. Gera um processador semântico com um procedimento para     |
+   |    cada simbolo  não terminal da gramatica.                   |
+   | 6. Gera um Analisador Léxico já integrado com a Análise       |
+   |    Sintática;                                                 |
+   | 7. Gera um Tradutor já devidamente integrado com a Análise    |
+   |    Sintática e a Análise Semântica;                           |
+   |                                                               |
+   #===============================================================#
+
+
+   #===============================================================#
+   #    2. Requisitos de Hardware e Software                       #
+   #===============================================================#
+   |                                                               |
+   | O FACC foi projetado para operar em ambientes de              |
+   | microcomputadores  da familia IBM PC com sistema operacional  |
+   | Windows.                                                      |
+   |                                                               |
+   #===============================================================#
+
+
+   #===============================================================#
+   #    3. Interpretador de gramaticas                             #
+   #===============================================================#
+   |                                                               |
+   | O FACC possui um interpretador de gramáticas que permite ao   |
+   | usuário validar a especificação da linguagem por ele          |
+   | projetada e inserir a chamada às rotinas semânticas nos       |
+   | pontos onde estas são desejadas.                              |
+   |                                                               | 
+   | 3.1 - Simbolos da gramatica                                   |                  
+   | ----------------------------                                  |
+   |                                                               |
+   | A gramática reconhecida pelo interpretador de gramáticas deve |
+   | seguir a seguinte especificação:                              | 
+   |                                                               |
+   | Não terminal: Identificador L[L|D]* (com até 30 caracteres);  |
+   | Terminal    : Conjunto de caracteres entre "aspas" ou         |
+   |               'apostrofes' (com até 30 caracteres);           |
+   | ->          : Indica início de lado direito de produção;      |
+   | ;           : indica fim de produção;                         |
+   | |           : indica que segue uma nova produção com o mesmo  |
+   |               não terminal do lado esquerdo da producão       |
+   |               anterior;                                       |
+   | #           : simbolo de produção vazia;                      |
+   | /* */       : Delimitador de comentario;                      |
+   | { codigo }  : Indica  um trecho de codigo "C" a ser inserido  |
+   |               no processador semântico;                       | 
+   | local       : Indica que o código que se segue deve ser       |
+   |               inserido na posição de declaração de variáveis  |
+   |               locais de um procedimento do processador        |
+   | 	           semântico gerado;                               |
+   | (codigo)    : Indica que o código entre  parenteses deve ser  |
+   |               inserido como parâmetro na chamada ou           |
+   |               declaração de um procedimento semântico;        |
+   | .variavel   : Indica  que  a variável (identificador com até  |
+   |               30 caracteres) deve receber o valor do atributo |
+   |               do terminal à sua esquerda.                     |
+   |                                                               |
+   | OBS: O não terminal da primeira produção da gramática é       |
+   |      considerado o símbolo inicial da gramática;              |
+   |                                                               |
+   | /* Gramatica da metalinguagem do interpretador */             |
+   |                                                               |
+   | /* 01 */ Espec -> Lista_prod ';' ;                            |
+   | /* 02 */ Lista_prod -> Lista_prod ';' Prod  |                 |
+   | /* 03 */               Prod ;                                 |
+   | /* 04 */ Prod -> 'nterm' Param_opc Local_opc '->' Lista_dir ; |
+   | /* 05 */ Param_opc -> '(texto_par)' |                         |
+   | /* 06 */              # ;                                     |
+   | /* 07 */ Local_opc -> 'local'  '{texto_cod}'  |               |
+   | /* 08 */              # ;                                     |
+   | /* 09 */ Codigo_opc -> Codigo_opc '{texto_cod}'  |            |
+   | /* 10 */               # ;                                    |
+   | /* 11 */ Lista_dir -> Lista_dir '|' Codigo_opc Parte_dir  |   |
+   | /* 12 */              Codigo_opc Parte_dir ;                  |
+   | /* 13 */ Parte_dir -> Lista_simb  |                           |
+   | /* 14 */              '#' Codigo_opc;                         |
+   | /* 15 */ Lista_simb -> Lista_simb Simb Codigo_opc  |          | 
+   | /* 16 */               Simb Codigo_opc;                       |
+   | /* 17 */ Simb -> 'nterm' Param_opc  |                         |
+   | /* 18 */         'term' Atrib_opc ;                           |
+   | /* 19 */ Atrib_opc -> '.atrib'  |                             |
+   | /* 20 */              # ;                                     |
+   |                                                               |
+   | Ex: /* Gramatica CALC.GRA */                                  |
+   |                                                               |
+   | /* 1 */ Calc local {int val;} -> 'C' Expressao(&val)          |
+   | 	       { printf("%d",val); } ;                             |
+   |                                                               |
+   | /* 2 */ Expressao(int *val) local { int val1; } -> Termo(val) |
+   | /* 3 */ | Expressao(val) '+' Termo(&val1) { *val += val1; } ; |
+   |                                                               |
+   | /* 4 */ Termo(int *val) local { int val1; } -> 'numero'.val1  |
+   | 	   { *val = val1; }                                        | 
+   | /* 5 */ |  Termo(val) '*' 'numero'.val1 { *val *= val1; } ;   |
+   |                                                               |
+   |                                                               |
+   | 3.1 - Verificacoes do interpretador                           |
+   | -----------------------------------                           |
+   |                                                               |
+   | Durante o processo de interpretação, a gramática é verificada |
+   | quanto à sua corretude, consistência e ambiguidade:           |
+   |                                                               |
+   | a) corretude: verifica se a gramática está  escrita apenas    |
+   |             com os elementos válidos e se estes se encontram  |
+   |             agrupados de  acordo com a sintaxe da             |
+   |             metalinguagem do intepretador;                    | 
+   |                                                               |
+   | b) consistência: verifica se todo símbolo não terminal deriva |
+   |             um símbolo terminal e se é atingido pelo 1o não   |
+   |             terminal da gramática (símbolo inicial);          |
+   |                                                               |
+   | c) ambiguidades: verifica se existem produçõs ambíguas na     |
+   |             gramatica (vide 4).                               |
+   |                                                               |
+   | OBS: Durante a análise da gramática só é apresentado um erro  |
+   | por linha para evitar erros decorrentes de erros anteriores   |
+   | (excecao p/ erros semânticos).                                |
+   |                                                               |
+   | Exemplos:                                                     | 
+   |   a) N -> 'a' ; /* correto */                                 |
+   |   N -> 'a' @;   /* erro: simbolo invalido */                  |
+   |   N -> ;        /* erro (sintatico): simbolo esperado */      |
+   |                                                               |
+   |   b) N -> A;                                                  |
+   |   A -> 'a' | B; /* erro (semântico): B não deriva terminal */ |
+   |   C -> 'b';     /* erro (semântico): C nao é atingido por N */|
+   |                                                               |
+   #===============================================================#
+
+
+   #===============================================================#
+   #    4. Ambiguidades                                            #
+   #===============================================================#
+   |                                                               |
+   | Ambiguidade na gramática significa que existe mais de uma     |
+   | produção que poderia ser aplicada durante o reconhecimento de |
+   | determinada instrução  da linguagem.                          | 
+   | A existência de ambiguidades na definição das linguagens pode |
+   | ser ou não desejada, portanto ela não é considerada um erro;  |
+   | contudo deve-se assumir uma das produções possiveis já que o  |
+   | parser gerado pelo FACC é determinístico.                     | 
+   |                                                               |
+   | /** Definicao **/                                             | 
+   | Considerando que o parser gerado monta a árvore sintática de  |
+   | forma inversa, ou seja, das folhas para a raiz, onde as       |
+   | folhas são os símbolos terminais e os nós intermediários e a  |
+   | raiz são os símbolos não terminais, podemos definir duas      |
+   | operações na montagem da arvore sintatica (parsing):          | 
+   |   SHIFT: consumo de um elemento da entrada;                   | 
+   |   REDUCE: aplicação de uma das producao produzindo uma nova   |
+   |      raiz para um ou mais elementos já reconhecidos;          |
+   |                                                               |
+   | O FACC trata as regras ambíguas considerando dois casos:      |
+   |                                                               |
+   |    a) CONFLITO DE SHIFT/REDUCE:                               |
+   |       - realiza o SHIFT;                                      |
+   |                                                               |
+   |    b) CONFLITO DE REDUCE/REDUCE:                              | 
+   |       - realiza o REDUCE pela 1a produção do conflito;        |
+   |                                                               |
+   | Exemplo:                                                      |
+   | /* Testa a ambiguidade do comando if-then-else */             |
+   |                                                               |
+   | /* 1 */ COM -> # |                                            |
+   | /* 2 */      'if' EXPR 'then' COM 'else' COM |                | 
+   | /* 3 */      'if' EXPR 'then' COM |                           |
+   | /* 4 */      'pare';                                          |
+   |                                                               |
+   | /* 5 */ EXPR -> 'true' |                                      | 
+   | /* 6 */         'false' ;                                     |
+   |                                                               |
+   | CONFLITO SHIFT/REDUCE P(2) e P(3) com o terminal 'else'       |
+   | SHIFT assumido !!!                                            |
+   |                                                               |
+   #===============================================================#
+
+
+   #===============================================================#
+   #    5. Os Produtos Gerados                                     #
+   #===============================================================#
+   |                                                               |
+   | FACC gera arquivos contendo código em liguagem C++ que em seu |
+   | conjunto implementam um tradutor.                             |
+   |                                                               |
+   | 5.1 - Parser LALR(1)                                          |
+   | --------------------                                          |
+   | O parser gerado consiste dos seguintes arquivos:              |
+   |                                                               |
+   | - AnalisadorSintatico.cpp:                                    |
+   |     Classe que realiza a análise sintática do tradutor;       |
+   |                                                               |
+   | - AnalisadorSintatico.h:                                      |
+   |     Arquivo de cabeçalho do analisador sintático;             |
+   |                                                               |
+   | - TabelaAnalisadorSintatico.h:                                |
+   |     Conjunto de tabelas e constantes utilizadas durante o     | 
+   |     "parsing".                                                |
+   |                                                               |
+   | 5.1.1 - Tratamento de erros                                   |
+   | ---------------------------                                   |
+   | O FACC nesta versão não incorpora nenhuma forma automática de |
+   | tratamento e recuperação de erros de "parsing", para tal      |
+   | sugere-se a consulta ao livro:                                |
+   |   "Compilers Principles, Techniques and Tools"                |
+   |    Aho, Alfred V.                                             |
+   |    Addison-Wesley Publishing Company, 1986;                   |
+   |                                                               |
+   | que aborda de forma detalhada o assunto, além de outras       |
+   | bibliografias relacionadas.                                   |
+   |                                                               | 
+   | 5.2 - Analisador Léxico                                       |
+   | --------------------                                          |
+   | O analisador léxico gerado consiste dos seguintes arquivos:   |
+   |                                                               |
+   | - AnalisadorLexico.cpp:                                       |
+   |     Classe que realiza a análise léxica do tradutor;          |
+   |     Essa classe é utilizada pelo parser como parte do         |
+   |     processo de Análise Sintática;                            |
+   |                                                               |
+   | - AnalisadorLexico.h:                                         |
+   |     Arquivo de cabeçalho do analisador léxico;                |
+   |                                                               |
+   | 5.3 - Processador Semantico                                   |
+   | ---------------------------                                   |
+   | O processador semântico gerado consiste dos seguintes         |
+   | arquivos:                                                     |
+   |                                                               |
+   | - AnalisadorSemantico.cpp:                                    |
+   |     Classe que realiza a análise semântica do tradutor;       |
+   |     Contém os métodos que correspondem às produções da        | 
+   | 	 gramática e possuem o código presente na gramática de     |
+   |     atributos.                                                |
+   |                                                               |
+   | - AnalisadorSemantico.h:                                      |
+   |     Arquivo de cabeçalho do analisador semântico;             |
+   |                                                               |
+   | 5.4 - Tradutor                                                |
+   | ---------------------------                                   |
+   | O tradutor consiste do seguinte arquivo:                      |
+   |                                                               |
+   | - Compilador.cpp:                                             |
+   |     Classe que faz a chamada aos analisadores sintático e     |
+   |     semântico.                                                |
+   |                                                               |
+   | 5.5 - Informacoes Auxiliares                                  |
+   | ----------------------------                                  |
+   | O FACC gera três arquivos com informações que auxiliam na     |
+   | análise  da gramatica:                                        |
+   |                                                               |
+   |   a) XXXXX.PRD : contém o conjunto expandido e numerado de    |
+   |             produções da gramática. Esse arquivo é útil na    |
+   |             análise das ambiguidades da gramática, já que     |
+   |             estas são reportadas com referência ao número das |
+   |             produções;                                        |
+   |                                                               | 
+   |   b) XXXXX.TAB : contém as tabelas do parser. Esse arquivo    |
+   |             pode ser  utilizado nos casos em que o usuário    |
+   |             deseja utilizar outra linguagem que não o "C" na  |
+   |             implementação do parser, para a inserção na       |
+   |             tabela de ação de códigos de tratamento de erro   |
+   |             e para uma compactação das tabelas geradas.       |
+   |                                                               |
+   |   c) XXXXX.GER : contém o conjunto de first's e o conjunto de |
+   |             estados do autômato de pilha que o parser         |
+   |             representa. Esse arquivo  traz informações        |
+   |             detalhadas sobre a geracao do  parser que tem     |
+   | 		 grande utilidade na análise das ambiguidades.     |
+   | 		 O conjunto de first's indica que terminais que    |
+   |             são  derivados de cada nao terminal.              |
+   |                                                               |
+   | 		 Exemplo:                                          |
+   |                                                               |
+   | 		 /* AMBI1.GER */                                   | 
+   |                                                               |
+   | 		  Conjunto de first's para os não terminais da     |
+   |              gramatica                                        |
+   |                                                               |
+   | 		  first(COM)  VAZIO if pare                        | 
+   | 		  first(EXPR) true false                           |
+   |                                                               |
+   | 		O conjunto de estados indica, para cada estado,    | 
+   |            quais as produções envolvidas, o ponto de análise  |
+   |            (representado pelo .) e o conjunto de "look-ahead",|
+   |            isto é, os símbolos terminais que  podem  surgir   |
+   |            para cada producao naquele estado de               |
+   |            reconhecimento, além de indicacao se o estado      |
+   |            apresenta conflito.                                | 
+   |                                                               |
+   | 	Exemplo:                                                   |
+   |                                                               |
+   | 	Conjunto de Estados criados durante a geração do Parser    | 
+   | 			   .                                       |
+   | 			   .                                       |
+   | 			   .                                       |
+   | 	Estado(8)  *** CONFLITO ***                                | 
+   | 	 (2) COM -> 'if' EXPR 'then' COM. 'else' COM { else $ }    |
+   | 	 (3) COM -> 'if' EXPR 'then' COM.  { else $ }              |
+   | 			   .                                       |
+   | 			   .                                       |
+   | 			   .                                       |
+   |                                                               |
+   #===============================================================#
+   
+
+   #===============================================================#
+   #    6. Operação                                                #
+   #===============================================================#
+   |                                                               |
+   | A forma de operação do FACC pode ser vista digitando-se FACC  |
+   | na linha de comando sem parâmetros.                           |
+   |                                                               |
+   #===============================================================#
+
+
+   #===============================================================#
+   #    7. Cópias                                                  #
+   #===============================================================#
+   |                                                               |
+   | O FACC é um produto acadêmico cujas cópias e utilização são   |
+   | liberadas desde que não  sejam usadas para fins comerciais.   |
+   | Caso haja interesse na utilização comercial da ferramenta     |
+   | deve-se entrar em contato com os autores.                     | 
+   |                                                               |
+   #===============================================================#
+
+
+   #===============================================================#
+   #    8. Possíveis "Bugs"                                        #
+   #===============================================================#
+   |                                                               |
+   | O FACC foi testado em ambiente de laboratório, mas como todo  |
+   | produto podem existir condições não  previstas que ocasionem  |
+   | uma operação anormal da ferramenta.                           |   
+   | Se ocorrer um erro na gerência de memória do FACC, este irá   |
+   | gerar o arquivo FACCERRO com indicação de onde ocorreu o      |
+   | problema. Problemas como este devem ser informados  ao  autor |
+   | para que  se  possa aplicar as correções necessárias para     |
+   | uma próxima release.                                          | 
+   |                                                               |
+   #===============================================================#
+
+

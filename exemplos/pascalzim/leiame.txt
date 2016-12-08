@@ -1,0 +1,8 @@
+
+---------------------------------------------------------------------------------
+Essa pasta contém a gramática utilizada para construção do compilador Pascalzim
+---------------------------------------------------------------------------------
+
+- pzim.gra: gramática utilizada pelo compilador
+
+
