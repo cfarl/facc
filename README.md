@@ -1,4 +1,4 @@
-# FACC - Ferramenta de Apoio a Construcao do Compiladores
+# FACC - Ferramenta de Apoio a Construção de Compiladores
 
 Essa ferramenta,de posse de uma gramática livre de contexto, produz arquivos contendo código fonte em C++ que correspondem ao esqueleto de um compilador.
 
