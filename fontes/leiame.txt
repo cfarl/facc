@@ -10,3 +10,14 @@
   https://sourceforge.net/projects/mingw/files/
 
 - Tendo instalado o Mingw e o Eclipse, basta importar o projeto a partir da IDE.
+
+- Se o debug apresentar erro 'Error with command: gdb --version', fazer o seguinte:
+
+1) Adicione o caminho do MingW no PATH do computador (exemplo: C:/MinGw/bin)
+
+2) Clique no projeto com o botão direito
+
+3) Selecione Debug, Debug Configurations 
+
+4) Clique na aba Debugger, escolha um gdb debugger clicando em Browse e selecionando gdb.exe da pasta "bin" do MingW
+

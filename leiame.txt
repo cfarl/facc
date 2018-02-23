@@ -17,7 +17,7 @@
    #===============================================================#
    |                                                               |
    | Este arquivo  contém  informações  sobre  a utilização do     |
-   | FACC - Ferramenta de Apoio a Construcao do Compiladores.      |
+   | FACC - Ferramenta de Apoio a Construção de Compiladores.      |
    |                                                               |
    | Os tópicos apresentados são:                                  |
    |                                                               |
